@@ -15,3 +15,10 @@ class Player:
 
     def collect(self, item):
         self.inventory.append(item)
+
+
+p = Player("CodeUp", 100, 100, 5, [])
+p.damage(5)
+print(p.health)
+p.collect("Sword")
+p.collect("Bow")
