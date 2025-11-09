@@ -23,23 +23,12 @@ while running:
     # draw white rects
     for r in rects:
         pygame.draw.rect(screen, WHITE, r)
-
-    pygame.display.flip()
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            pos = pygame.mouse.get_pos()
-            mouse = pygame.Rect(pos[0], pos[1], 1, 1)
-            idx = mouse.collidelist(rect_list)
-            if idx != -1:
-                pygame.draw.rect(screen, (0, 0, 0), rect_list[idx])
-                pygame.display.flip()
-
-pygame.quit()
+        pygame.display.flip()
+running = True
+while running:
+    for eevent in pygame.event.get():
+        running = False
+    elif event.type == pygame.MOUSEBUTTONDOWN:
+    pos = pygame.mouse.get_pos()
+    
+ pygame.quit()
