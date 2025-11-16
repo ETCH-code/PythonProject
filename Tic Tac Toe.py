@@ -52,6 +52,32 @@ class Board:
         pygame.draw.line(surface, white,
                          (200, 200 + 133 + 134), (600, 200 + 133 + 134))
 
+    def clicked_on_box(self, coordinate):
+        if self.game_over:
+            return
+
+    mouse = pygame.Rect(coordinate.x, coordinate.y, 1, 1)
+    collided = mouse.collidelist(self.squares)
+        if collided == -1:
+            return
+        else:
+            x, y = collided_to_xy(collided)
+            if self.is_empty_square(x, y):
+                self.place_marker(x, y)
+            else:
+                return
+
+    def collided_to_xy(self, collided):
+        x = collided % 3
+        y = collided // 3
+        return x, y
+
+    def is_empty_square(self, x, y):
+        return self.board_values[x][y] == "0"
+
+    def switch_move(self):
+        
+
 BOARD = Board()
 clear_button_rect = pygame.Rect(300, 50, 200, 75)
 mode_button_rect = pygame.Rect(575, 50, 175, 75)
