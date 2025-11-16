@@ -55,13 +55,12 @@ class Board:
     def clicked_on_box(self, coordinate):
         if self.game_over:
             return
-
-    mouse = pygame.Rect(coordinate.x, coordinate.y, 1, 1)
-    collided = mouse.collidelist(self.squares)
+        mouse = pygame.Rect(coordinate.x, coordinate.y, 1, 1)
+        collided = mouse.collidelist(self.squares)
         if collided == -1:
             return
         else:
-            x, y = collided_to_xy(collided)
+            x, y = self.collided_to_xy(collided)
             if self.is_empty_square(x, y):
                 self.place_marker(x, y)
             else:
@@ -76,7 +75,35 @@ class Board:
         return self.board_values[x][y] == "0"
 
     def switch_move(self):
-        
+        if self.current_move == "X":
+            self.current_move = "O"
+        else:
+            self.current_move = "X"
+
+    def place_marker(self, x, y):
+        self.board_values[x][y] = self.current_move
+        self.switch_move()
+
+    def clear_board(self):
+        self.board_values = [["0", "0", "0"],
+                             ["0", "0", "0"],
+                             ["0", "0", "0"]]
+        self.game_over = False
+        self.current_move = "X"
+
+
+    def draw_value(self, surface, collided):
+        rect = self.squares[collided]
+        x, y = self.collided_to_xy(collided)
+
+        if self.board_values[x][y] == "X":
+            text_rect = text_x.get_rect()
+            text_rect.center = (rect.x + rect.w // 2, rect.y + rect.h // 2)
+            surface.blit(text_x, text_rect)
+        elif self.board_values[x][y] == "O":
+            text_rect = text_o.get_rect()
+            text_rect.center = (rect.x + rect.w // 2, rect.y + rect.h // 2)
+            surface.blit(text_o, text_rect)
 
 BOARD = Board()
 clear_button_rect = pygame.Rect(300, 50, 200, 75)
@@ -86,6 +113,13 @@ while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            x, y = pygame.mouse.get_pos()
+            BOARD.clicked_on_box(Coordinate(x, y))
+            if clear_button_rect.collidepoint(x, y):
+                BOARD.clear_board()
+            elif mode_button_rect.collidepoint(x, y):
+                BOARD.alternate_computer_move_value = not BOARD.alternate_computer_move_value
 
     screen.fill((0, 0, 0))
     BOARD.draw_board(screen)
@@ -96,5 +130,34 @@ while True:
     text_reset_rect = text_reset.get_rect()
     text_reset_rect.center = (400, 90)
     screen.blit(text_reset, text_reset_rect)
+
+    # rendering "current move" text
+    text_move = small_font.render(f"Current move: {BOARD.current_move}", True, (255, 255, 255))
+    text_move_rect = text_move.get_rect()
+    text_move_rect.center = (100, 100)
+    screen.blit(text_move, text_move_rect)
+
+    # drawing change mode button
+    mode_change_button = pygame.draw.rect(screen, (0, 255, 0), mode_button_rect)
+    text_change_mode = small_font.render("Change Mode", True, (255, 255, 255))
+    text_change_mode_rect = text_change_mode.get_rect()
+    text_change_mode_rect.center = ((575 + 575 + 175) // 2, (50 + 50 + 75) // 2)
+    screen.blit(text_change_mode, text_change_mode_rect)
+
+    # rendering "current mode" text
+    status = ""
+    if BOARD.alternate_computer_move_value:
+        status = "Singleplayer"
+    else:
+        status = "Multiplayer"
+
+    text_mode = small_font.render(f"Current Mode: {status}", True, (255, 255, 255))
+    text_mode_rect = text_mode.get_rect()
+    text_mode_rect.center = (400, 700)
+    screen.blit(text_mode, text_mode_rect)
+
+    # drawing markers onto the screen
+    for i in range(9):
+        BOARD.draw_value(screen, i)
 
     pygame.display.flip()
